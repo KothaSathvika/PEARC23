@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mnist
+  labels:
+    app: mnist
+spec:
+  selector:
+    app: mnist
+  ports:
+    - protocol: TCP
+      port: 8001
+      name: grpc
+      targetPort: 8001
+  type: LoadBalancer

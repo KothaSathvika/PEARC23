@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mnist
+  labels:
+    app: mnist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mnist
+  template:
+    metadata:
+      labels:
+        app: mnist
+    spec:
+      volumes:
+        - name: models
+      containers:
+        - name: mnist
+          image: "fastml/triton-torchgeo:22.07-py3-geometric"
+          ports:
+            - containerPort: 8001
+              name: grpc-triton
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+               secretKeyRef:
+                name: s3-credentials
+                key: S3_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                 name: s3-credentials
+                 key: S3_SECRET_KEY
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+          volumeMounts:
+            - mountPath: /models
+              name : models
+          command: ["/bin/sh", "-c"]
+          args: ["cd /models && /opt/tritonserver/bin/tritonserver --model-repository=s3://https://s3.anvilcloud.rcac.purdue.edu:443/model --allow-gpu-metrics=false --strict-model-config=false"]
+          resources:
+            limits:
+              nvidia.com/mig-1g.10gb: 1
