@@ -14,8 +14,6 @@ spec:
       labels:
         app: mnist
     spec:
-      volumes:
-        - name: models
       containers:
         - name: mnist
           image: "fastml/triton-torchgeo:22.07-py3-geometric"
@@ -39,7 +37,7 @@ spec:
             - mountPath: /models
               name : models
           command: ["/bin/sh", "-c"]
-          args: ["cd /models && /opt/tritonserver/bin/tritonserver --model-repository=s3://https://s3.anvilcloud.rcac.purdue.edu:443/model --allow-gpu-metrics=false --strict-model-config=false"]
+          args: ["cd /models && /opt/tritonserver/bin/tritonserver --model-repository=s3://https://s3.anvilcloud.rcac.purdue.edu:443/<username> --allow-gpu-metrics=true --strict-model-config=false"]
           resources:
             limits:
               nvidia.com/mig-1g.10gb: 1
